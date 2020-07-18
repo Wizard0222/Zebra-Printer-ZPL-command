@@ -1,0 +1,41 @@
+import socket
+import codecs
+import datetime
+with codecs.open('SYFC.txt', mode='r', encoding='utf-8') as file_txt:
+    data = file_txt.read()
+    str1 = data[5:]
+    num1 = int(str1)
+    num2 = num1 +1
+    str2 = str(num2).zfill(9)
+    data2 = data[:4]+str2
+
+with codecs.open('SYFC.txt', mode='w', encoding='utf-8') as file_txt:
+    file_txt.write(data2)
+
+with codecs.open('NAME.txt', mode='r', encoding='utf-8') as name_txt:
+    name = name_txt.read()
+with codecs.open('LVLI.txt', mode='r', encoding='utf-8') as lvli_txt:
+    lvli = lvli_txt.read()
+with codecs.open('BIANHAO.txt', mode='r', encoding='utf-8') as bianhao_txt:
+    bianhao = bianhao_txt.read()
+
+
+curr_time = datetime.datetime.now()
+time_str0 = datetime.datetime.strftime(curr_time,'%Y/%m/%d %H:%M')
+time_str1 = str(time_str0)
+
+
+address = ("192.168.254.254",9100)
+s = socket.socket()
+s.connect(address)
+dataA = '^XA'
+dataCode = '^FO15,20^BQN,2,4^FD'+str2+'&TEBXNHXAXX&P1755515-00-A:1TYFAY0137127^FS'
+dataT1 =    '^FO160,30^ADN,18,10^FD'+name+'^FS'
+dataTime =  '^FO160,80^ADN,18,10^FD'+time_str0+'^FS'
+dataT2 =  '^FO160,130^ADN,18,10^FD'+lvli+'^FS'
+dataT3 = '^FO15,180^ADN,18,10^FD'+bianhao+'^FS'
+dataZ = '^XZ'
+dataAll = dataA + dataCode + dataT1 + dataTime + dataT2 + dataT3 + dataZ
+print(dataAll)
+s.send(dataAll.encode())
+s.close()
